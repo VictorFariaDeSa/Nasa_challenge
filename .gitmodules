@@ -1,0 +1,6 @@
+[submodule "Nasa_challenge_front"]
+	path = Nasa_challenge_front
+	url = https://github.com/VictorFariaDeSa/Nasa_challenge_front.git
+[submodule "Nasa_challenge_backend"]
+	path = Nasa_challenge_backend
+	url = https://github.com/VictorFariaDeSa/Nasa_challenge_backend.git
