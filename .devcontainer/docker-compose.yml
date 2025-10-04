@@ -1,0 +1,66 @@
+version: "3.9"
+
+services:
+  postgress_container:
+    build:
+      context: ../Nasa_challenge_backend/database
+      dockerfile: Dockerfile
+    image: trendingorbit_database:latest
+    container_name: trendingorbit_database_container
+    ports:
+      - "${DATABASE_PORT}:${DATABASE_PORT}"
+    networks:
+      - my_custom_network
+    env_file:
+      - .env
+    environment:
+      POSTGRES_USER: ${DATABASE_USER}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+      POSTGRES_DB: ${DATABASE_NAME}
+
+  python_server:
+    build:
+      context: ../Nasa_challenge_backend/server
+      dockerfile: Dockerfile
+    image: trendingorbit_server:latest
+    container_name: trendingorbit_server_container
+    volumes:
+      - ../Nasa_challenge_backend/server:/server
+    ports:
+      - "${SERVER_PORT}:${SERVER_PORT}"
+    networks:
+      - my_custom_network
+    environment:
+      DATABASE_HOST: postgress_container
+      DATABASE_PORT: ${DATABASE_PORT}
+      DATABASE_USER: ${DATABASE_USER}
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD}
+      DATABASE_NAME: ${DATABASE_NAME}
+      SERVER_PORT: ${SERVER_PORT}
+    depends_on:
+      - postgress_container  
+    env_file:
+      - .env
+
+  react_client:
+    build:
+      context: ../Nasa_challenge_front
+      dockerfile: Dockerfile
+    image: trendingorbit_client:latest
+    container_name: trendingorbit_client_container
+    volumes:
+    - ../Nasa_challenge_front:/client
+    ports:
+      - "${CLIENT_PORT}:${CLIENT_PORT}"
+    networks:
+      - my_custom_network
+    environment:
+      SERVER_PORT: ${SERVER_PORT}
+    depends_on:
+      - python_server
+    env_file:
+      - .env
+      
+networks:
+  my_custom_network:
+    driver: bridge
